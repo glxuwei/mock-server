@@ -4,7 +4,7 @@ block content
   form(id="mock-server-submit", method="post", style="display:flex;flex-direction:column;height:100vh;overflow:hidden;")
     input(type="submit", id="mock-server-submit-btn", value="保存", class="code-editor-submit")
     div(class="code-editor-wrap")
-      textarea(name="code", id="codeEditor")!= content
+      textarea(name="code", class="code-editor-textarea", id="codeEditor")!= content
     script(src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.js")
     script(src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/javascript/javascript.min.js")
     script(src="https://cdn.bootcdn.net/ajax/libs/jshint/2.13.4/jshint.min.js")
@@ -70,7 +70,7 @@ block content
       editor.on('blur', save);
       document.addEventListener('keydown', function(event) {
         const isCtrl = event.ctrlKey || event.metaKey;
-        if (isCtrl && event.key === 's' || event.code === 'KeyS') {
+        if (isCtrl && (event.key === 's' || event.code === 'KeyS')) {
             // 执行保存操作
             event.preventDefault(); // 阻止默认行为，如浏览器的保存页面对话框
             save();
