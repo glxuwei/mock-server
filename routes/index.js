@@ -58,35 +58,35 @@ async function navigateHandler(req, res, filePath) {
 };
 
 const handler = async (req, res) => {
-    const headers = req.headers;
-    const fileDir = `../mock${req.path}`;
-    const filePath = getFilePath(fileDir);
-    if (headers['sec-fetch-mode'] === 'navigate' || !headers.referer) {
-      navigateHandler(req, res, filePath);
+  const headers = req.headers;
+  const fileDir = `../mock${req.path}`;
+  const filePath = getFilePath(fileDir);
+  if (headers['sec-fetch-mode'] === 'navigate' || !headers.referer) {
+    navigateHandler(req, res, filePath);
+    return;
+  }
+  const { type, value = '' } = req.body || {};
+  if (type === res.locals.HANDLE_TYPE) {
+    let content = value.trim();
+    if (!content.replace(/\s*[\n\t][;]?\s*/g, '')) {
+      content = TEMPLATE;
+    }
+    await fs.writeFile(filePath, content, 'utf-8');
+    res.json({ code: 0 });
+    return;
+  }
+  await writeFile(filePath);
+  try {
+    const data = await fs.readFile(filePath, 'utf-8');
+    if (/^\s*{[\s\S]*}\s*$/.test(data)) {
+      res.json(JSON.parse(data));
       return;
     }
-    const { type, value = '' } = req.body || {};
-    if (type === res.locals.HANDLE_TYPE) {
-      let content = value.trim();
-      if (!content.replace(/\s*[\n\t][;]?\s*/g, '')) {
-        content = TEMPLATE;
-      }
-      await fs.writeFile(filePath, content, 'utf-8');
-      res.json({ code: 0 });
-      return;
-    }
-    await writeFile(filePath);
-    try {
-      const data = await fs.readFile(filePath, 'utf-8');
-      if (/^\s*{[\s\S]*}\s*$/.test(data)) {
-        res.json(JSON.parse(data));
-        return;
-      }
-    } catch(e) {
-      res.json(e);
-      return;
-    }
-    res.json(await delay(require(fileDir))(req));
+  } catch(e) {
+    res.json(e);
+    return;
+  }
+  res.json(await delay(require(fileDir))(req));
 };
 
 router.get('/*', handler);
