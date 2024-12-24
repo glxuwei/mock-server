@@ -1,0 +1,17 @@
+{
+    "restartable": "rs",
+    "ignore": [
+      ".git",
+      "node_modules/**/node_modules",
+      "public/"
+    ],
+    "watch": [
+      "./"
+    ],
+    "exec": "NODE_ENV=development node ./bin/www",
+    "events": [
+      "change"
+    ],
+    "log": true,
+    "legacy-watch": false
+  }

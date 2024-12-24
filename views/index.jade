@@ -1,0 +1,83 @@
+extends layout
+
+block content
+  form(id="mock-server-submit", method="post", style="display:flex;flex-direction:column;height:100vh;overflow:hidden;")
+    input(type="submit", id="mock-server-submit-btn", value="保存", class="code-editor-submit")
+    div(class="code-editor-wrap")
+      textarea(name="code", id="codeEditor")!= content
+    script(src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.js")
+    script(src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/javascript/javascript.min.js")
+    script(src="https://cdn.bootcdn.net/ajax/libs/jshint/2.13.4/jshint.min.js")
+    script(src="https://cdn.bootcdn.net/ajax/libs/codemirror/5.65.5/addon/lint/lint.min.js")
+    script(src="https://cdn.bootcdn.net/ajax/libs/codemirror/5.65.5/addon/lint/javascript-lint.min.js")
+    script.
+      // 初始化 CodeMirror 编辑器
+      var editor = CodeMirror.fromTextArea(document.getElementById('codeEditor'), {
+        lineNumbers: true,
+        mode: "javascript",
+        lint: {
+          asi: true,
+          esversion: 6,
+        },
+        gutters: ["CodeMirror-lint-markers"],
+      });
+      var isSave = false;
+      var form = document.getElementById('mock-server-submit');
+      var content = editor.getValue();
+      var save = function(event) {
+        // 阻止表单的默认提交行为
+        if (isSave) {
+          return;
+        }
+        var errors = window.JSHINT.errors;
+        var len = errors.length;
+        if (len) {
+          for (var i = 0; i < len; i++) {
+            var code = errors[i].code;
+            if (/^E/.test(code)) {
+              return;
+            }
+          }
+        }
+        var value = editor.getValue();
+        if (content === value) {
+          return;
+        }
+        var saveBtn = document.getElementById('mock-server-submit-btn');
+        var disabledClassName = 'code-editor-submit-disabled';
+        saveBtn.classList.add(disabledClassName);
+        isSave = true;
+        fetch(window.location.href, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            type: '#{HANDLE_TYPE}',
+            value: value || ''
+          })
+        }).then(function(response){ 
+          return response.json();
+        }).then(function(){
+          content = value;
+        }).catch(function(error){
+          console.error(error);
+        }).then(function(){
+          isSave = false;
+          saveBtn.classList.remove(disabledClassName);
+        });
+      };
+      editor.on('blur', save);
+      document.addEventListener('keydown', function(event) {
+        const isCtrl = event.ctrlKey || event.metaKey;
+        if (isCtrl && event.key === 's' || event.code === 'KeyS') {
+            // 执行保存操作
+            event.preventDefault(); // 阻止默认行为，如浏览器的保存页面对话框
+            save();
+        }
+      });
+      form.onsubmit = function(event) {
+          // 阻止表单的默认提交行为
+          event.preventDefault();
+          save();
+      };
