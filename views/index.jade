@@ -5,11 +5,11 @@ block content
     input(type="submit", id="mock-server-submit-btn", value="保存", class="code-editor-submit")
     div(class="code-editor-wrap")
       textarea(name="code", class="code-editor-textarea", id="codeEditor")!= content
-    script(src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.js")
-    script(src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/javascript/javascript.min.js")
-    script(src="https://cdn.bootcdn.net/ajax/libs/jshint/2.13.4/jshint.min.js")
-    script(src="https://cdn.bootcdn.net/ajax/libs/codemirror/5.65.5/addon/lint/lint.min.js")
-    script(src="https://cdn.bootcdn.net/ajax/libs/codemirror/5.65.5/addon/lint/javascript-lint.min.js")
+    script(src="#{PUBLIC_PATH}/javascripts/codemirror/5.65.5/codemirror.min.js")
+    script(src="#{PUBLIC_PATH}/javascripts/codemirror/5.65.5/mode/javascript/javascript.min.js")
+    script(src="#{PUBLIC_PATH}/javascripts/jshint/2.13.4/jshint.min.js")
+    script(src="#{PUBLIC_PATH}/javascripts/codemirror/5.65.5/lint.min.js")
+    script(src="#{PUBLIC_PATH}/javascripts/codemirror/5.65.5/javascript-lint.min.js")
     script.
       // 初始化 CodeMirror 编辑器
       var editor = CodeMirror.fromTextArea(document.getElementById('codeEditor'), {
