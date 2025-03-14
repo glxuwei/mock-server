@@ -1,4 +1,5 @@
 const express = require('express');
+const childProcess = require('child_process');
 const fs = require('fs').promises;
 const path = require('path');
 
@@ -51,9 +52,17 @@ async function navigateHandler(req, res, filePath) {
     content = TEMPLATE;
     await writeFile(filePath, content);
   }
-  res.render('index', {
-    title: '',
-    content,
+  childProcess.exec(`cursor ${filePath}`, (error) => {
+    if (error) {
+      childProcess.exec(`code ${filePath}`, (err) => {
+        if (err) {
+          res.render('index', {
+            title: '',
+            content,
+          });
+        }
+      })
+    }
   });
 };
 
