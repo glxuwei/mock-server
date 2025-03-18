@@ -19,7 +19,8 @@ app.all('*', function (req, res, next) {
     res.header("Access-Control-Allow-Origin", origin);  //允许的访问域
   }
   res.header("Access-Control-Allow-Credentials", "true");  //服务端允许携带cookie
-  res.header("Access-Control-Allow-Headers", "*");  //访问头
+  // res.header("Access-Control-Allow-Headers", "*");  //访问头
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, Identity, guazisso, x-ganji-token, pai-token, Accept, Referer, User-Agent, *");
   res.header("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS");  //访问方法
   res.header("Content-Security-Policy", " upgrade-insecure-requests");
   res.header("X-Powered-By", ' 3.2.1');
