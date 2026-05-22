@@ -18,7 +18,7 @@ const delay = (fn) => (...args) => {
   return new Promise(resolve => {
     setTimeout(() => {
       resolve(fn.apply(null, args));
-    }, Math.random * 1000);
+    }, 100);
   });
 };
 
@@ -70,7 +70,8 @@ const handler = async (req, res) => {
   const headers = req.headers;
   const fileDir = `../mock${req.path}`;
   const filePath = getFilePath(fileDir);
-  if (headers['sec-fetch-mode'] === 'navigate' || !headers.referer) {
+  // if (headers['sec-fetch-mode'] === 'navigate' || !headers.referer) {
+  if (headers['sec-fetch-mode'] === 'navigate') {
     navigateHandler(req, res, filePath);
     return;
   }

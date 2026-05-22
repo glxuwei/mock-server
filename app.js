@@ -1,4 +1,3 @@
-const fs = require('fs');
 const path = require('path');
 const express = require('express');
 const createError = require('http-errors');
@@ -14,23 +13,26 @@ function setGloalVars(req, res, next) {
 
 app.all('*', function (req, res, next) {
   const origin = req.headers.origin;
-  fs.mkdirSync(path.resolve(__dirname, `./mock/${req.path}`), { recursive: true });
-  if (/guazi(?:-cloud|-apps)?\.com/.test(origin)) {
-    res.header("Access-Control-Allow-Origin", origin);  //允许的访问域
+
+  if (origin && /guazi(?:-cloud|-apps)?\.com/.test(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
   }
-  res.header("Access-Control-Allow-Credentials", "true");  //服务端允许携带cookie
-  // res.header("Access-Control-Allow-Headers", "*");  //访问头
-  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, Identity, guazisso, x-ganji-token, pai-token, Accept, Referer, User-Agent, *");
-  res.header("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS");  //访问方法
-  res.header("Content-Security-Policy", " upgrade-insecure-requests");
-  res.header("X-Powered-By", ' 3.2.1');
-  if (req.method == 'OPTIONS') {
-      res.header("Access-Control-Max-Age", 86400);
-      res.sendStatus(204); //让options请求快速返回.
+
+  const requestedHeaders = req.headers['access-control-request-headers'];
+  res.setHeader(
+    'Access-Control-Allow-Headers',
+    requestedHeaders || 'Content-Type, Authorization, Identity, guazisso, x-ganji-token, pai-token, Accept, Referer, User-Agent, request-id'
+  );
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS,PATCH');
+  res.setHeader('Content-Security-Policy', ' upgrade-insecure-requests');
+  res.setHeader('X-Powered-By', ' 3.2.1');
+
+  if (req.method === 'OPTIONS') {
+    res.setHeader('Access-Control-Max-Age', '86400');
+    return res.sendStatus(204);
   }
-  else {
-      next();
-  }
+  next();
 });
 
 app.set('views', path.join(__dirname, 'views'));
